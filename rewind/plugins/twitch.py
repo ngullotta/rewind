@@ -1,4 +1,4 @@
-from streamlink.plugin import PluginArgument, plugin
+from streamlink.plugin import PluginArgument
 from streamlink.plugins.twitch import Twitch
 
 
@@ -26,5 +26,6 @@ class TwitchRewind(Twitch):
             )
         ]:
             self.arguments.arguments[arg.name] = arg
+
 
 __plugin__ = TwitchRewind
