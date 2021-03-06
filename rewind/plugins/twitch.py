@@ -1,14 +1,14 @@
-from streamlink.plugin import PluginArgument
+from streamlink.plugin import PluginArgument, PluginArguments
 from streamlink.plugins.twitch import Twitch
 
 
 class TwitchRewind(Twitch):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        for arg in [
-            PluginArgument(
+    arguments = PluginArguments(
+        *[
+            argument for argument in Twitch.arguments.arguments.values()
+        ],
+        PluginArgument(
                 "check-vods",
                 action="store_true",
                 help="""
@@ -16,16 +16,13 @@ class TwitchRewind(Twitch):
                 notcurrently streaming.
                 """
             ),
-            PluginArgument(
-                "vod-check-limit",
-                action="store_true",
-                default=10,
-                help="""
-                Limit VODs to X most recent
-                """
-            )
-        ]:
-            self.arguments.arguments[arg.name] = arg
-
+        PluginArgument(
+            "vod-check-limit",
+            default=10,
+            help="""
+            Limit VODs to X most recent
+            """
+        )
+    )
 
 __plugin__ = TwitchRewind
