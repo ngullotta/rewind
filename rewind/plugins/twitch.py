@@ -8,14 +8,16 @@ class TwitchRewind(Twitch):
         *[
             argument for argument in Twitch.arguments.arguments.values()
         ],
+
         PluginArgument(
-                "check-vods",
-                action="store_true",
-                help="""
-                Check for VODs (Videos On Demand) if the selected streamer is
-                notcurrently streaming.
-                """
-            ),
+            "check-vods",
+            action="store_true",
+            help="""
+            Check for VODs (Videos On Demand) if the selected streamer is
+            notcurrently streaming.
+            """
+        ),
+
         PluginArgument(
             "vod-check-limit",
             default=10,
