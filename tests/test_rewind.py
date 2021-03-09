@@ -17,3 +17,8 @@ def plugin(session):
 def test_twitch(session, plugin):
     assert(plugin)
     assert(session)
+
+
+def test_twitch_get_vods(plugin):
+    streams = plugin.streams()
+    pass
