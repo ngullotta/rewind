@@ -107,11 +107,33 @@ class TwitchRewind(Twitch):
         )
     )
 
+    @staticmethod
+    def clamp(value: int, lower: int, upper: int) -> int:
+        return max(lower, min(upper, value))
+
+    @staticmethod
+    def get_int_from_user(prompt: str = None) -> int:
+        while True:
+            try:
+                raw = input(prompt)
+                if raw == "":
+                    continue
+                return int(raw)
+            except (ValueError):
+                print("That doesn't look like a number...")
+                continue
+            except (KeyboardInterrupt):
+                break
+        return int()
+
     def _parse_video_data(self, response: dict) -> List[TwitchVOD]:
-        vod_list = []
+        rv = []
         for data in response.get("videos", []):
-            vod_list.append(TwitchVOD(data))
-        return vod_list
+            vod = TwitchVOD(data)
+            if not vod.has_streams:
+                self._fill_vod_stream(vod)
+            rv.append(vod)
+        return sorted(rv, key=lambda vod: vod.date, reverse=True)
 
     def _fill_vod_stream(self, vod: TwitchVOD) -> None:
         tmp = self.video_id
@@ -124,20 +146,9 @@ class TwitchRewind(Twitch):
         finally:
             self.video_id = tmp
 
-    def _get_vods(self) -> OrderedDict:
-        vods = OrderedDict()
-        try:
-            res = self._get_videos(broadcast_type="archive")
-            for vod in self._parse_video_data(res):
-                self._fill_vod_stream(vod)
-                vods[vod.id] = vod
-            return OrderedDict(
-                sorted(vods.items(), key=lambda obj: obj[1].date, reverse=True)
-            )
-        except (PluginError, HTTPError) as e:
-            self.logger.error(e)
-        finally:
-            return vods
+    def _get_vods(self) -> List[TwitchVOD]:
+        res = self._get_videos(broadcast_type="archive")
+        return self._parse_video_data(res)
 
     def _get_videos(self, **kwargs) -> dict:
         return self.api.call(
@@ -149,30 +160,33 @@ class TwitchRewind(Twitch):
         if not self.options.get("check_vods"):
             return
 
-        vods = self._get_vods()
+        try:
+            vods = list(self._get_vods())
+        except (PluginError, HTTPError) as e:
+            self.logger.error(e)
+            return
+
         if len(vods) == 0:
             return
 
-        vlist = list(vods.values())
         if self.options.get("pick_most_recent_vod"):
-            return self.vods[0]
+            for vod in vods:
+                if vod.has_streams:
+                    return vod.streams
 
-        for i, vod in enumerate(vlist):
-            print(
-                f"[{i + 1:2d}] {vod.date} | ({vod.id}) {vod.title} {vod.game}"
-            )
+        for i, vod in enumerate(vods):
+            if vod.has_streams:
+                print(
+                    f"[{i + 1:2d}] {vod.date} | ({vod.id}) {vod.title} {vod.game}"
+                )
 
-        try:
-            choice = int(input("Pick a VOD: "))
-            if choice < 0:
-                choice = 0
-            if choice > len(vlist):
-                choice = len(vlist)
-        except (ValueError):
-            choice = 1
-        except (KeyboardInterrupt):
-            choice = 1
-        return vlist[choice - 1].streams
+        choice = self.get_int_from_user(prompt="Pick a VOD: ")
+
+        vod = vods[self.clamp(choice, len(vods), 1) - 1]
+        if vod.has_streams:
+            return vod.streams
+        else:
+            return
 
     def _get_streams(self) -> Union[OrderedDict, None]:
         if (stream := super()._get_streams()) is not None:
