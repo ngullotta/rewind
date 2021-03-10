@@ -3,6 +3,7 @@ name = "rewind"
 version = "0.1.0"
 description = ""
 authors = ["Nikolaus Gullotta <nik@harrisonconsoles.com>"]
+license = "GPL-3.0-or-later"
 
 [tool.poetry.dependencies]
 python = "^3.9"
