@@ -122,10 +122,10 @@ class TwitchRewind(Twitch):
         finally:
             self.video_id = tmp
 
-    def _get_vods(self) -> dict:
+    def _get_vods(self) -> OrderedDict:
+        vods = OrderedDict()
         try:
             res = self._get_videos(broadcast_type="archive")
-            vods = OrderedDict()
             for vod in self._parse_video_data(res):
                 self._fill_vod_stream(vod)
                 vods[vod.id] = vod
@@ -134,15 +134,16 @@ class TwitchRewind(Twitch):
             )
         except (PluginError, HTTPError) as e:
             self.logger.error(e)
-        return {}
+        finally:
+            return vods
 
-    def _get_videos(self, **kwargs):
+    def _get_videos(self, **kwargs) -> dict:
         return self.api.call(
             f"/kraken/channels/{self.channel_id}/videos",
             **kwargs
         )
 
-    def _check_vods(self) -> Union[None, OrderedDict]:
+    def _check_vods(self) -> Union[OrderedDict, None]:
         if not self.options.get("check_vods"):
             return
 
@@ -161,13 +162,17 @@ class TwitchRewind(Twitch):
 
         try:
             choice = int(input("Pick a VOD: "))
+            if choice < 0:
+                choice = 0
+            if choice > len(vlist):
+                choice = len(vlist)
         except (ValueError):
             choice = 1
         except (KeyboardInterrupt):
             choice = 1
         return vlist[choice - 1].streams
 
-    def _get_streams(self):
+    def _get_streams(self) -> Union[OrderedDict, None]:
         if (stream := super()._get_streams()) is not None:
             return stream
         return self._check_vods()
