@@ -13,6 +13,10 @@ class TwitchVOD:
         self.data = data
         self._streams = OrderedDict()
 
+    @property
+    def has_streams(self):
+        return len(self._streams) >= 1
+
     @staticmethod
     def _parse_date_str(date: str) -> datetime:
         if date is not None and date.endswith("Z"):
