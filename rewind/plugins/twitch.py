@@ -28,8 +28,8 @@ class TwitchVOD:
         return datetime.utcfromtimestamp(0)
 
     @property
-    def id(self) -> Union[str, None]:
-        return self.data.get("_id")[1:]
+    def id(self) -> str:
+        return self.data.get("_id", "")[1:]
 
     @property
     def title(self) -> str:

@@ -10,7 +10,7 @@ class Client(Streamlink):
         "twitch": TwitchRewind
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         for name, plugin in self.REWIND_OVERWRITES.items():
             self.add_plugin(plugin, name)
