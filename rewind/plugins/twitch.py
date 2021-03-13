@@ -15,7 +15,7 @@ class TwitchVOD:
         self._streams = OrderedDict()
         self._index = 1
 
-    @property 
+    @property
     def index(self):
         return self._index
 
