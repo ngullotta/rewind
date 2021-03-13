@@ -459,6 +459,17 @@ requests = ">=2.21.0,<3.0"
 websocket-client = "*"
 
 [[package]]
+category = "main"
+description = "Pretty-print tabular data"
+name = "tabulate"
+optional = false
+python-versions = "*"
+version = "0.8.9"
+
+[package.extras]
+widechars = ["wcwidth"]
+
+[[package]]
 category = "dev"
 description = "Python Library for Tom's Obvious, Minimal Language"
 name = "toml"
@@ -507,7 +518,7 @@ python-versions = "*"
 version = "1.12.1"
 
 [metadata]
-content-hash = "885dd4bd476c924bf9b04f571d36540042e4e9dccb575a07862354db6e42702a"
+content-hash = "f6cea1495d0b643338299b4eab6c723b3df84161c20f821c3a4789dcf656a5fe"
 lock-version = "1.0"
 python-versions = "^3.9"
 
@@ -746,6 +757,10 @@ streamlink = [
     {file = "streamlink-2.0.0-py3-none-win32.whl", hash = "sha256:be098c0c4afc9dd7c6e7a276761a8fc4190a7a624b166499cbd02dc08f118bfe"},
     {file = "streamlink-2.0.0-py3-none-win_amd64.whl", hash = "sha256:badd4584967299e63aea74ccb758ac1fa8e887e718a016b8f1125bd943e3ff76"},
     {file = "streamlink-2.0.0.tar.gz", hash = "sha256:c0ead9e961638d41cab9bd9677cdc701f2313bfd4d23cd8158410932839c62db"},
+]
+tabulate = [
+    {file = "tabulate-0.8.9-py3-none-any.whl", hash = "sha256:d7c013fe7abbc5e491394e10fa845f8f32fe54f8dc60c6622c6cf482d25d47e4"},
+    {file = "tabulate-0.8.9.tar.gz", hash = "sha256:eb1d13f25760052e8931f2ef80aaf6045a6cceb47514db8beab24cded16f13a7"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},

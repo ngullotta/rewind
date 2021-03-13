@@ -5,6 +5,7 @@ from typing import List, OrderedDict, Union
 from requests import HTTPError
 from streamlink.plugin import PluginArgument, PluginArguments, PluginError
 from streamlink.plugins.twitch import Twitch
+from tabulate import tabulate
 
 
 class TwitchVOD:
@@ -12,6 +13,16 @@ class TwitchVOD:
     def __init__(self, data: dict) -> None:
         self.data = data
         self._streams = OrderedDict()
+        self._index = 1
+
+    @property 
+    def index(self):
+        return self._index
+
+    @index.setter
+    def index(self, value):
+        self._index = value
+        return self.index
 
     @property
     def has_streams(self):
@@ -70,6 +81,18 @@ class TwitchVOD:
         self._streams = value
         return self.streams
 
+    def __repr__(self) -> str:
+        return tabulate(
+            [[self.index, self.id, self.game, self.date, self.title]],
+            headers=[
+                "#",
+                "ID",
+                "Game",
+                "Date",
+                "Title"
+            ]
+        )
+
 
 class TwitchRewind(Twitch):
 
@@ -109,7 +132,7 @@ class TwitchRewind(Twitch):
 
     @staticmethod
     def clamp(value: int, lower: int, upper: int) -> int:
-        return max(lower, min(upper, value))
+        return max(upper, min(lower, value))
 
     @staticmethod
     def get_int_from_user(prompt: str = None) -> int:
@@ -127,12 +150,14 @@ class TwitchRewind(Twitch):
         return int()
 
     def _parse_video_data(self, response: dict) -> List[TwitchVOD]:
-        rv = []
+        rv, idx = [], 1
         for data in response.get("videos", []):
             vod = TwitchVOD(data)
             if not vod.has_streams:
                 self._fill_vod_stream(vod)
+            vod.index = idx
             rv.append(vod)
+            idx += 1
         return sorted(rv, key=lambda vod: vod.date, reverse=True)
 
     def _fill_vod_stream(self, vod: TwitchVOD) -> None:
@@ -174,14 +199,24 @@ class TwitchRewind(Twitch):
                 if vod.has_streams:
                     return vod.streams
 
-        for i, vod in enumerate(vods):
-            if vod.has_streams:
-                print(
-                    f"[{i + 1:2d}] {vod.date} | ({vod.id}) {vod.title} {vod.game}"
-                )
+        print(
+            tabulate(
+                [
+                    [vod.index, vod.id, vod.game, vod.date, vod.title]
+                    for vod in vods if vod.has_streams
+                ],
+                headers=[
+                    "#",
+                    "ID",
+                    "Game",
+                    "Date",
+                    "Title"
+                ]
+            )
+        )
 
         choice = self.get_int_from_user(prompt="Pick a VOD: ")
-
+        normalized = self.clamp(choice, len(vods), 1) - 1
         vod = vods[self.clamp(choice, len(vods), 1) - 1]
         if vod.has_streams:
             return vod.streams
