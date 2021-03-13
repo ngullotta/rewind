@@ -216,12 +216,10 @@ class TwitchRewind(Twitch):
         )
 
         choice = self.get_int_from_user(prompt="Pick a VOD: ")
-        normalized = self.clamp(choice, len(vods), 1) - 1
+
         vod = vods[self.clamp(choice, len(vods), 1) - 1]
         if vod.has_streams:
             return vod.streams
-        else:
-            return
 
     def _get_streams(self) -> Union[OrderedDict, None]:
         if (stream := super()._get_streams()) is not None:
