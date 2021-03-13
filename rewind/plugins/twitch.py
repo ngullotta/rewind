@@ -98,6 +98,7 @@ class TwitchRewind(Twitch):
 
     logger = logging.getLogger("TwitchRewind")
 
+    # pylint: disable=unnecessary-comprehension
     arguments = PluginArguments(
         *[
             argument for argument in Twitch.arguments.arguments.values()
@@ -181,18 +182,19 @@ class TwitchRewind(Twitch):
             **kwargs
         )
 
+    # pylint: disable=unsubscriptable-object
     def _check_vods(self) -> Union[OrderedDict, None]:
         if not self.options.get("check_vods"):
-            return
+            return None
 
         try:
             vods = list(self._get_vods())
         except (PluginError, HTTPError) as e:
             self.logger.error(e)
-            return
+            return None
 
         if len(vods) == 0:
-            return
+            return None
 
         if self.options.get("pick_most_recent_vod"):
             for vod in vods:
@@ -221,6 +223,9 @@ class TwitchRewind(Twitch):
         if vod.has_streams:
             return vod.streams
 
+        return None
+
+    # pylint: disable=unsubscriptable-object
     def _get_streams(self) -> Union[OrderedDict, None]:
         if (stream := super()._get_streams()) is not None:
             return stream
