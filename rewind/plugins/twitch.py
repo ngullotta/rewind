@@ -167,7 +167,7 @@ class TwitchRewind(Twitch):
         try:
             self.video_id = vod.id
             vod.streams = self._get_hls_streams_video()
-        except (Exception):
+        except (PluginError):
             pass
         finally:
             self.video_id = tmp
