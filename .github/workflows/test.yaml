@@ -17,20 +17,20 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        pip install poetry
-        poetry install --dev
-        poetry config virtualenvs.in-project true
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry install --dev
+          poetry config virtualenvs.in-project true
 
-    - name: Analysis with Prospector
-      run: |
-        poetry run prospector rewind --strictness veryhigh
+      - name: Analysis with Prospector
+        run: |
+          poetry run prospector rewind --strictness veryhigh
 
-    - name: Lint with Flake8
-      run: |
-        poetry run flake8 --count --max-complexity=10 --max-line-length=127 --statistics
+      - name: Lint with Flake8
+        run: |
+          poetry run flake8 --count --max-complexity=10 --max-line-length=127 --statistics
 
-    - name: Test with Pytest
-      run: |
-        poetry run pytest
+      - name: Test with Pytest
+        run: |
+          poetry run pytest
