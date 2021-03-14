@@ -2,6 +2,8 @@
 
 ![Badge for GitHub repo top language](https://img.shields.io/github/languages/top/legionxvx/rewind?style=flat&logo=appveyor) ![Badge for GitHub last commit](https://img.shields.io/github/last-commit/legionxvx/rewind?style=flat&logo=appveyor)
 
+![Tests](https://github.com/legionxvx/rewind/actions/workflows/test.yaml/badge.svg)
+
 Check out the badges hosted by [shields.io](https://shields.io/).
 
 
