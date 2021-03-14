@@ -3,7 +3,6 @@ from datetime import datetime, timedelta, timezone
 from typing import List, OrderedDict, Union
 
 from requests import HTTPError
-from streamlink import stream
 from streamlink.plugin import PluginArgument, PluginArguments, PluginError
 from streamlink.plugins.twitch import Twitch
 from tabulate import tabulate
