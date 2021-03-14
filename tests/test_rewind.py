@@ -21,4 +21,4 @@ def test_twitch(session, plugin):
 
 def test_twitch_get_vods(plugin):
     streams = plugin.streams()
-    assert(streams)
+    assert(streams is not None)
