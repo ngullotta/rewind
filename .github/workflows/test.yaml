@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install poetry
-          poetry install --dev
+          poetry install
           poetry config virtualenvs.in-project true
 
       - name: Analysis with Prospector
