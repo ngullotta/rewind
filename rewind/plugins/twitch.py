@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 from typing import List, OrderedDict, Union
 
 from requests import HTTPError
+from streamlink import stream
 from streamlink.plugin import PluginArgument, PluginArguments, PluginError
 from streamlink.plugins.twitch import Twitch
 from tabulate import tabulate
@@ -215,8 +216,9 @@ class TwitchRewind(Twitch):
 
     # pylint: disable=unsubscriptable-object
     def _get_streams(self) -> Union[OrderedDict, None]:
-        if (stream := super()._get_streams()) is not None:
-            return stream
+        streams = super()._get_streams()
+        if streams is not None:
+            return streams
         return self._check_vods()
 
 
