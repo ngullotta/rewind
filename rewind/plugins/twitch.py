@@ -43,7 +43,7 @@ class TwitchVOD:
         return datetime.utcfromtimestamp(0)
 
     @property
-    def id(self) -> str:
+    def identifier(self) -> str:
         return self.data.get("_id", "")[1:]
 
     @property
@@ -80,18 +80,6 @@ class TwitchVOD:
     def streams(self, value: OrderedDict) -> OrderedDict:
         self._streams = value
         return self.streams
-
-    def __repr__(self) -> str:
-        return tabulate(
-            [[self.index, self.id, self.game, self.date, self.title]],
-            headers=[
-                "#",
-                "ID",
-                "Game",
-                "Date",
-                "Title"
-            ]
-        )
 
 
 class TwitchRewind(Twitch):
@@ -143,31 +131,31 @@ class TwitchRewind(Twitch):
                 if raw == "":
                     continue
                 return int(raw)
-            except (ValueError):
+            except ValueError:
                 print("That doesn't look like a number...")
                 continue
-            except (KeyboardInterrupt):
+            except KeyboardInterrupt:
                 break
         return int()
 
     def _parse_video_data(self, response: dict) -> List[TwitchVOD]:
-        rv, idx = [], 1
+        vods, idx = [], 1
         for data in response.get("videos", []):
             vod = TwitchVOD(data)
             if not vod.has_streams:
                 self._fill_vod_stream(vod)
             vod.index = idx
-            rv.append(vod)
+            vods.append(vod)
             idx += 1
-        return sorted(rv, key=lambda vod: vod.date, reverse=True)
+        return sorted(vods, key=lambda vod: vod.date, reverse=True)
 
     def _fill_vod_stream(self, vod: TwitchVOD) -> None:
         tmp = self.video_id
 
         try:
-            self.video_id = vod.id
+            self.video_id = vod.identifier
             vod.streams = self._get_hls_streams_video()
-        except (PluginError):
+        except PluginError:
             pass
         finally:
             self.video_id = tmp
@@ -189,8 +177,8 @@ class TwitchRewind(Twitch):
 
         try:
             vods = list(self._get_vods())
-        except (PluginError, HTTPError) as e:
-            self.logger.error(e)
+        except (PluginError, HTTPError) as ex:
+            self.logger.error(ex)
             return None
 
         if len(vods) == 0:
@@ -204,7 +192,7 @@ class TwitchRewind(Twitch):
         print(
             tabulate(
                 [
-                    [vod.index, vod.id, vod.game, vod.date, vod.title]
+                    [vod.index, vod.identifier, vod.game, vod.date, vod.title]
                     for vod in vods if vod.has_streams
                 ],
                 headers=[
@@ -232,4 +220,5 @@ class TwitchRewind(Twitch):
         return self._check_vods()
 
 
+# pylint: disable=invalid-name
 __plugin__ = TwitchRewind
