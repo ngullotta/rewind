@@ -38,4 +38,6 @@ jobs:
 
       - name: Publish to PyPI
         run: |
-          poetry publish
+          poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+          poetry version $(git describe --tags --abbrev=0 2>/dev/null || echo "0.1.0")
+          poetry publish --build
