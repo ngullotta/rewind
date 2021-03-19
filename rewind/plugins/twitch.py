@@ -134,9 +134,6 @@ class TwitchRewind(Twitch):
             except ValueError:
                 print("That doesn't look like a number...")
                 continue
-            except KeyboardInterrupt:
-                break
-        return int()
 
     def _parse_video_data(self, response: dict) -> List[TwitchVOD]:
         vods, idx = [], 1
