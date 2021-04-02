@@ -23,6 +23,8 @@ that are 'past broadcast' aware (like Twitch VODs)
 
 # Installation
 
+You will need [poetry](https://python-poetry.org/) to install.
+
 ## Easiest Method (Not Intended for Development)
 I plan on publishing this on PyPI when I get around to it (and can land on a 
 non-conflicting name), until then —
