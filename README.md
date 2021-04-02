@@ -11,7 +11,7 @@ Check out the badges hosted by [shields.io](https://shields.io/).
 Rewind is a wrapper around the Streamlink library to allow for custom plugins 
 that are 'past broadcast' aware (like Twitch VODs)
 
-Currently supported plugins:
+### Currently supported plugins:
 - Twitch
 
 ## Table of Contents
