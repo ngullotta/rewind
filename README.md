@@ -9,7 +9,7 @@ Check out the badges hosted by [shields.io](https://shields.io/).
 
 ## Description 
 Rewind is a wrapper around the Streamlink library to allow for custom plugins 
-that are 'rerun' aware (like Twitch VODs)
+that are 'past broadcast' aware (like Twitch VODs)
 
 Currently supported plugins:
 - Twitch
@@ -23,26 +23,33 @@ Currently supported plugins:
 
 # Installation
 
-## Easiest Method (Not Intending Development)
+## Easiest Method (Not Intended for Development)
+I plan on publishing this on PyPI when I get around to it (and can land on a 
+non-conflicting name), until then —
 ```bash
-$ pip install rewind
+$ git checkout https://github.com/legionxvx/rewind.git
+$ cd rewind
+$ pip install . --user
 ```
 
-## For Everyone Else
+## For Everyone Else (Intended for Developers or Others)
 ```bash
-$ git checkout ...
-$ cd repo
+$ git checkout https://github.com/legionxvx/rewind.git
+$ cd rewind
 $ poetry install
 $ poetry run python -m rewind
 ```
 
 # Usage
+Because he never streams...
 ```bash
 $ rewind www.twitch.tv/clinststevens best --twitch-check-vods
 ```
 
 # Tests
-poetry run pytest
+```bash
+$ poetry run pytest
+```
 
 # License
 GNU GPLv3
