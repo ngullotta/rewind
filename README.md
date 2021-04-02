@@ -52,6 +52,8 @@ $ rewind www.twitch.tv/clinststevens best --twitch-check-vods
 ```
 
 # Tests
+Tests are just stubs right now, and have very poor coverage, but I'll fix that 
+in the future...
 ```bash
 $ poetry run pytest
 ```
