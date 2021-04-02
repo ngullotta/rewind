@@ -22,7 +22,11 @@ that are 'past broadcast' aware (like Twitch VODs)
 * [License](#license)
 
 # Installation
-You will need [poetry](https://python-poetry.org/) to install.
+You will need [poetry](https://python-poetry.org/) to install a development 
+environment. 
+
+You probably do not `poetry` if you don't intend on development, but I've 
+never tried it without it :)
 
 ## Easiest Method (Not Intended for Development)
 I plan on publishing this on PyPI when I get around to it (and can land on a 
