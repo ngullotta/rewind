@@ -22,7 +22,6 @@ that are 'past broadcast' aware (like Twitch VODs)
 * [License](#license)
 
 # Installation
-
 You will need [poetry](https://python-poetry.org/) to install.
 
 ## Easiest Method (Not Intended for Development)
