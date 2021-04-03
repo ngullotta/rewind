@@ -6,9 +6,9 @@ authors = ["Nikolaus Gullotta <nik@harrisonconsoles.com>"]
 license = "GPL-3.0-or-later"
 
 [tool.poetry.dependencies]
-python = ">=3.7"
-streamlink = "^2.0.0"
+python = "^3.7"
 tabulate = "^0.8.9"
+streamlink = "^2.1.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
