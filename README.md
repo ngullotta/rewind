@@ -61,6 +61,10 @@ $ poetry run pytest
 # License
 GNU GPLv3
 
+# Contributing
+Currently there is no formal method of contribution. Obviously PRs are welcome
+however, they must have tests associated with them!
+
 ## Questions?
 For any questions, please contact me with the information below:
 
