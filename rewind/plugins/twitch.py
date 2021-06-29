@@ -4,13 +4,11 @@ from typing import Dict, List, OrderedDict, Union
 
 from requests import HTTPError
 from streamlink.plugin import PluginArgument, PluginArguments, PluginError
-from streamlink.plugins.twitch import Twitch, log
+from streamlink.plugins.twitch import Twitch
 from tabulate import tabulate
 
 
 class TwitchVOD:
-
-    logger = log  # Use the logger from streamlink
 
     def __init__(self, data: dict) -> None:
         self.data = data
@@ -18,16 +16,16 @@ class TwitchVOD:
         self._index = 1
 
     @property
-    def index(self):
+    def index(self) -> int:
         return self._index
 
     @index.setter
-    def index(self, value):
+    def index(self, value) -> int:
         self._index = value
         return self.index
 
     @property
-    def has_streams(self):
+    def has_streams(self) -> bool:
         return len(self._streams) >= 1
 
     @staticmethod
