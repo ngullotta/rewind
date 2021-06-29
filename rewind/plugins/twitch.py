@@ -1,14 +1,16 @@
 import logging
 from datetime import datetime, timedelta, timezone
-from typing import List, OrderedDict, Union
+from typing import Dict, List, OrderedDict, Union
 
 from requests import HTTPError
 from streamlink.plugin import PluginArgument, PluginArguments, PluginError
-from streamlink.plugins.twitch import Twitch
+from streamlink.plugins.twitch import Twitch, log
 from tabulate import tabulate
 
 
 class TwitchVOD:
+
+    logger = log  # Use the logger from streamlink
 
     def __init__(self, data: dict) -> None:
         self.data = data
@@ -61,7 +63,7 @@ class TwitchVOD:
     @property
     def date(self) -> datetime:
         created = self.data.get("created_at")
-        return self._parse_date_str(created)
+        return self._parse_date_str(created).strftime("%Y-%m-%d")
 
     @property
     def length(self) -> timedelta:
@@ -169,38 +171,39 @@ class TwitchRewind(Twitch):
 
     # pylint: disable=unsubscriptable-object
     def _check_vods(self) -> Union[OrderedDict, None]:
+        self.logger.info(f"{self.channel} is not currently streaming...")
+
         if not self.options.get("check_vods"):
             return None
+
+        self.logger.info("Checking for past broadcasts now")
 
         try:
             vods = list(self._get_vods())
         except (PluginError, HTTPError) as ex:
-            self.logger.error(ex)
+            self.logger.error(f"Could not get past broadcasts: {ex}")
             return None
 
         if len(vods) == 0:
+            self.logger.info(f"{self.channel} has no past broadcasts")
             return None
 
         if self.options.get("pick_most_recent_vod"):
             for vod in vods:
                 if vod.has_streams:
+                    self.logger.info("Loading most recent past broadcast now")
                     return vod.streams
 
-        print(
-            tabulate(
-                [
-                    [vod.index, vod.identifier, vod.game, vod.date, vod.title]
-                    for vod in vods if vod.has_streams
-                ],
-                headers=[
-                    "#",
-                    "ID",
-                    "Game",
-                    "Date",
-                    "Title"
-                ]
-            )
-        )
+        _map = {
+            "#": "index",
+            "ID": "identifier",
+            "Game": "game",
+            "Date": "date",
+            "Length": "length",
+            "Title": "title"
+        }
+
+        self.print_tab_vod_info(vods, _map)
 
         choice = self.get_int_from_user(prompt="Pick a VOD: ")
 
@@ -216,6 +219,33 @@ class TwitchRewind(Twitch):
         if streams is not None:
             return streams
         return self._check_vods()
+
+    def print_tab_vod_info(
+        self,
+        vod_list: List[TwitchVOD],
+        header_attrib_map: Dict,
+        ignore_missing: bool = True
+    ) -> None:
+        vlist = list(filter(lambda v: v.has_streams, vod_list))
+
+        if len(vlist) == 0:
+            return
+
+        tabular_data = []
+        for vod in vlist:
+            data = []
+            for attrib in header_attrib_map.values():
+                if not hasattr(vod, attrib):
+                    self.logger.warning(
+                        f"{vod} does not have attribute {attrib}"
+                    )
+                    if not ignore_missing:
+                        continue
+                data.append(getattr(vod, attrib, None))
+            tabular_data.append(data)
+
+        headers = header_attrib_map.keys()
+        self.logger.info("\n" + tabulate(tabular_data, headers))
 
 
 # pylint: disable=invalid-name
