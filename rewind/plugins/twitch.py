@@ -163,7 +163,7 @@ class TwitchRewind(Twitch):
 
     def _get_videos(self, **kwargs) -> dict:
         return self.api.call(
-            f"/kraken/channels/{self.channel_id}/videos",
+            f"/kraken/channels/{self.channel}/videos",
             **kwargs
         )
 
