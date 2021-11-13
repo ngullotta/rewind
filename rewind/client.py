@@ -6,9 +6,7 @@ from rewind.plugins import TwitchRewind
 
 class Client(Streamlink):
 
-    REWIND_OVERWRITES = {
-        "twitch": TwitchRewind
-    }
+    REWIND_OVERWRITES = {"twitch": TwitchRewind}
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

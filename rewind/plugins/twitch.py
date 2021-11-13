@@ -9,7 +9,6 @@ from tabulate import tabulate
 
 
 class TwitchVOD:
-
     def __init__(self, data: dict) -> None:
         self.data = data
         self._streams = OrderedDict()
@@ -88,35 +87,30 @@ class TwitchRewind(Twitch):
 
     # pylint: disable=unnecessary-comprehension
     arguments = PluginArguments(
-        *[
-            argument for argument in Twitch.arguments.arguments.values()
-        ],
-
+        *[argument for argument in Twitch.arguments.arguments.values()],
         PluginArgument(
             "check-vods",
             action="store_true",
             help="""
             Check for VODs (Videos On Demand) if the selected streamer is
             notcurrently streaming.
-            """
+            """,
         ),
-
         PluginArgument(
             "pick-most-recent-vod",
             action="store_true",
             help="""
             Check for VODs (Videos On Demand) if the selected streamer is
             notcurrently streaming.
-            """
+            """,
         ),
-
         PluginArgument(
             "vod-check-limit",
             default=10,
             help="""
             Limit VODs to X most recent
-            """
-        )
+            """,
+        ),
     )
 
     @staticmethod
@@ -163,8 +157,7 @@ class TwitchRewind(Twitch):
 
     def _get_videos(self, **kwargs) -> dict:
         return self.api.call(
-            f"/kraken/channels/{self.channel}/videos",
-            **kwargs
+            f"/kraken/channels/{self.channel}/videos", **kwargs
         )
 
     # pylint: disable=unsubscriptable-object
@@ -198,7 +191,7 @@ class TwitchRewind(Twitch):
             "Game": "game",
             "Date": "date",
             "Length": "length",
-            "Title": "title"
+            "Title": "title",
         }
 
         self.print_tab_vod_info(vods, _map)
@@ -222,7 +215,7 @@ class TwitchRewind(Twitch):
         self,
         vod_list: List[TwitchVOD],
         header_attrib_map: Dict,
-        ignore_missing: bool = True
+        ignore_missing: bool = True,
     ) -> None:
         vlist = list(filter(lambda v: v.has_streams, vod_list))
 
