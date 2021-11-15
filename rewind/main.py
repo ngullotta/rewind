@@ -11,5 +11,4 @@ def patched_streamlink_setup():
 
 def run():
     main.setup_streamlink = patched_streamlink_setup
-    print("fucdk")
     main.main()

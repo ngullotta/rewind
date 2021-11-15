@@ -1,12 +1,60 @@
 import logging
 from datetime import timedelta
-from typing import OrderedDict, Union
+from typing import Any, List, OrderedDict, Union
 
 from streamlink.plugin import PluginArgument, PluginArguments
 from streamlink.plugin.api import validate
 from streamlink.plugins.twitch import Twitch, TwitchAPI
+from tabulate import tabulate
 
 StreamReturnType = Union[OrderedDict, None]
+NodeList = List[dict]
+
+
+class Node(dict):
+    __default_whitelist = ["id", "title"]
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.whitelist = kwargs.pop("whitelist", self.__default_whitelist)
+        self._cull()
+
+    def _cull(self):
+        keys = [k for k in self.keys() if k not in self.whitelist]
+        for k in keys:
+            del self[k]
+
+    def __setitem__(self, k, v) -> Any:
+        if k in self.whitelist.keys():
+            return super().__setitem__(k, v)
+
+
+class NodePrompt:
+    def __init__(self, nodes: NodeList) -> None:
+        self.nodes = [Node(node) for node in nodes]
+
+    @staticmethod
+    def clamp(value: int, lower: int, upper: int) -> int:
+        return max(upper, min(lower, value))
+
+    @staticmethod
+    def prompt_user_for_selection(
+        text: str = "Pick a number:", _type: Any = int
+    ) -> Any:
+        while (raw := input(text)) != "":
+            if raw.isnumeric():
+                return _type(raw)
+            print(f'That doesn\'t look like a "{_type.__name__}"...')
+        return _type()
+
+    def make_prompt(self, **tab_kwargs) -> str:
+        return tabulate(self.nodes, **tab_kwargs)
+
+    def run_prompt(self, attr: str = "id") -> int:
+        print(self.make_prompt(headers="keys", showindex=True))
+        idx = self.prompt_user_for_selection()
+        idx = self.clamp(idx, len(self.nodes), 1)
+        return self.nodes[idx - 1].get("id")
 
 
 class TwitchAPIRewind(TwitchAPI):
@@ -82,20 +130,14 @@ class TwitchRewind(Twitch):
     def _check_past_broadcasts(self) -> StreamReturnType:
         self.logger.info("Checking for past broadcasts...")
 
-        nodes = self.api.video_tower(self.channel)
-        for node in nodes:
-            _id = node.get("id", "")
-            title = node.get("title", "")
-            print(
-                _id,
-                "->",
-                title,
-                timedelta(seconds=node.get("lengthSeconds")),
-                node.get("game", {}).get("name"),
-            )
-            if _id:
-                self.video_id = _id
-                break
+        if nodes := self.api.video_tower(self.channel):
+            if self.options.get("pick_most_recent_vod"):
+                for node in nodes:
+                    self.video_id = node.get("id")
+                    return
+
+            prompter = NodePrompt(nodes)
+            self.video_id = prompter.run_prompt()
 
         return self._get_streams()
 
