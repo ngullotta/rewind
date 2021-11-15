@@ -54,7 +54,7 @@ class NodePrompt:
         print(self.make_prompt(headers="keys", showindex=True))
         idx = self.prompt_user_for_selection()
         idx = self.clamp(idx, len(self.nodes), 1)
-        return self.nodes[idx - 1].get("id")
+        return self.nodes[idx].get("id")
 
 
 class TwitchAPIRewind(TwitchAPI):
