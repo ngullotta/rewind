@@ -1,6 +1,6 @@
 import logging
 from datetime import timedelta
-from typing import Any, List, OrderedDict, Union
+from typing import Any, Dict, List, OrderedDict, Union
 
 from streamlink.plugin import PluginArgument, PluginArguments
 from streamlink.plugin.api import validate
@@ -8,52 +8,34 @@ from streamlink.plugins.twitch import Twitch, TwitchAPI
 from tabulate import tabulate
 
 StreamReturnType = Union[OrderedDict, None]
-NodeList = List[dict]
-
-
-class Node(dict):
-    __default_whitelist = ["id", "title"]
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.whitelist = kwargs.pop("whitelist", self.__default_whitelist)
-        self._cull()
-
-    def _cull(self):
-        keys = [k for k in self.keys() if k not in self.whitelist]
-        for k in keys:
-            del self[k]
-
-    def __setitem__(self, k, v) -> Any:
-        if k in self.whitelist.keys():
-            return super().__setitem__(k, v)
+NodeList = List[Dict]
 
 
 class NodePrompt:
-    def __init__(self, nodes: NodeList) -> None:
-        self.nodes = [Node(node) for node in nodes]
+    def __init__(self, nodes: NodeList, filter: set = {}) -> None:
+        if len(nodes) > 0:
+            filter = filter if len(filter) > 0 else nodes[-1].keys()
+
+        self.nodes = [
+            {k: node.get(k) for k in node.keys() & filter} for node in nodes
+        ]
 
     @staticmethod
     def clamp(value: int, lower: int, upper: int) -> int:
-        return max(upper, min(lower, value))
+        return max(lower, min(value, upper))
 
     @staticmethod
-    def prompt_user_for_selection(
-        text: str = "Pick a number:", _type: Any = int
-    ) -> Any:
+    def user_input_prompter(text: str = "Pick a Past Broadcast: ") -> Any:
         while (raw := input(text)) != "":
             if raw.isnumeric():
-                return _type(raw)
-            print(f'That doesn\'t look like a "{_type.__name__}"...')
-        return _type()
+                return int(raw)
+            print("That doesn't look like an integer...")
+        return 0
 
-    def make_prompt(self, **tab_kwargs) -> str:
-        return tabulate(self.nodes, **tab_kwargs)
-
-    def run_prompt(self, attr: str = "id") -> int:
-        print(self.make_prompt(headers="keys", showindex=True))
-        idx = self.prompt_user_for_selection()
-        idx = self.clamp(idx, len(self.nodes), 1)
+    def __call__(self) -> int:
+        print(tabulate(self.nodes, headers="keys", showindex=True))
+        idx = self.user_input_prompter()
+        idx = self.clamp(idx, 0, len(self.nodes))
         return self.nodes[idx].get("id")
 
 
@@ -136,8 +118,10 @@ class TwitchRewind(Twitch):
                     self.video_id = node.get("id")
                     return
 
-            prompter = NodePrompt(nodes)
-            self.video_id = prompter.run_prompt()
+            prompter = NodePrompt(
+                nodes, filter={"id", "title", "lengthSeconds", "publishedAt"}
+            )
+            self.video_id = prompter()
 
         return self._get_streams()
 
