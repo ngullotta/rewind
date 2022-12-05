@@ -1,10 +1,11 @@
 import logging
-from datetime import timedelta
+import os
 from typing import Any, Dict, List, OrderedDict, Union
 
 from streamlink.plugin import PluginArgument, PluginArguments
 from streamlink.plugin.api import validate
 from streamlink.plugins.twitch import Twitch, TwitchAPI
+from streamlink_cli.main import args
 from tabulate import tabulate
 
 StreamReturnType = Union[OrderedDict, None]
@@ -12,13 +13,24 @@ NodeList = List[Dict]
 
 
 class NodePrompt:
+    limit = int(os.popen("stty size", "r").read().split()[-1]) // 2
+
     def __init__(self, nodes: NodeList, filter: set = {}) -> None:
         if len(nodes) > 0:
             filter = filter if len(filter) > 0 else nodes[-1].keys()
 
+        if "title" in filter:
+            for node in nodes:
+                node["title"] = self.truncate(node.get("title", ""))
+
         self.nodes = [
             {k: node.get(k) for k in node.keys() & filter} for node in nodes
         ]
+
+    def truncate(self, key: str, filler: str = "...") -> str:
+        if len(key) > self.limit:
+            return key[0 : self.limit - len(filler)] + filler
+        return key
 
     @staticmethod
     def clamp(value: int, lower: int, upper: int) -> int:
