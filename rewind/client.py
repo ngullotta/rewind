@@ -14,6 +14,6 @@ class Client(Streamlink):
             self.add_plugin(plugin, name)
 
     def add_plugin(self, plugin: Plugin, name: str = "unknown") -> Plugin:
-        plugin.bind(self, name, self.get_option("user-input-requester"))
-        self.plugins[plugin.module] = plugin
-        return self.plugins[plugin.module]
+        # plugin.bind(self, name, self.get_option("user-input-requester"))
+        self.plugins[name] = plugin
+        return self.plugins[name]
